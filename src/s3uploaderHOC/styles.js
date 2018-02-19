@@ -2,6 +2,7 @@ const primaryColor = '#238bf9';
 const bgColor = '#f5f9fa';
 const secondaryColor = '#d8ebf1';
 
+
 export default {
     box: {
         background: '#fff',
@@ -30,14 +31,16 @@ export default {
         alignItems: 'center',
         justifyContent: 'center',
         height: 120,
-        border: `2px dashed ${secondaryColor}`,
+        outline: `2px dashed ${secondaryColor}`,
         color: '#3b7e92',
         fontSize: 16,
         borderRadius: 5,
+        transition: 'all .3s ease-in-out',
         '&.is-drag-over': {
+            outlineOffset: -12,
+            outlineColor: '#908f8f',
             background: 'rgba(217, 236, 241, 0.25)',
         },
-
         '& img': {
             maxWidth: 32,
             verticalAlign: 'bottom',
@@ -114,12 +117,30 @@ export default {
         borderCollapse: 'collapse',
         // border: '1px solid #e0e0e0',
         '& tr': {
+            transition: 'background .3s ease-in-out',
+            '& span': {
+                display: 'inline-block',
+                verticalAlign: 'text-bottom',
+                marginRight: 4,
+                '& svg': {
+                    verticalAlign: 'middle',
+                    fill: "#ccc",
+                    transition: 'all .1s linear',
+                    fillOpacity: .7,
+                },
+            },
+            '& .statusColumn': {
+                color: '#ccc',
+                transition: 'color .3s ease-in-out',
+                whiteSpace: 'nowrap'
+            },
             '& >*': {
                 border: '1px solid #e0e0e0',
                 borderWidth: [[1, 0]],
                 padding: [[8, 15]],
                 fontSize: 13,
-                width: '1%',
+                width: '.25%',
+                boxSizing: 'border-box',
                 '&:first-child': {
                     width: '5%'
                 },
@@ -166,22 +187,47 @@ export default {
             '&:nth-child(even) > td': {
                 background: '#fdfdfd'
             },
+            '&.uploading-finalize': {
+                '& .statusColumn': {
+                    color: '#007bff'
+                },
+                '& span': {
+                    '& svg': {
+                        fill: "#007bff",
+                    }
+                },
+            },
             '&.uploading-in-process': {
-                background: '#f7fbff !important',
-                '& > *': {
-                    background: 'transparent !important'
+                '& .statusColumn': {
+                    color: '#f0ad4e'
+                },
+                '& span': {
+                  '& svg': {
+                      fill: "#f0ad4e",
+                  }
+                },
+                '& .loadIcon': {
+                    animation: 'App-logo-spin infinite 2s linear',
                 },
             },
             '&.uploading-done': {
-                background: '#f8fff8 !important',
-                '& > *': {
-                    background: 'transparent !important'
+                '& .statusColumn': {
+                    color: '#46bb00'
+                },
+                '& span': {
+                    '& svg': {
+                        fill: "#46bb00",
+                    }
                 },
             },
             '&.uploading-fail': {
-                background: '#fff7f7 !important',
-                '& > *': {
-                    background: 'transparent !important'
+                '& .statusColumn': {
+                    color: '#db2828'
+                },
+                '& span': {
+                    '& svg': {
+                        fill: "#db2828",
+                    }
                 },
             },
         },
@@ -218,6 +264,5 @@ export default {
                 }
             }
         }
-    }
-
+    },
 }
