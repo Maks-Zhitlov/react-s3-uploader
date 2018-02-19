@@ -5,8 +5,6 @@ import styles from './styles';
 import S3Upload from './s3upload.js';
 import PropTypes from 'prop-types';
 
-console.log(PropTypes);
-
 export function getDataTransferItems(event) {
     let dataTransferItemsList = [];
     console.log(dataTransferItemsList);
@@ -61,11 +59,26 @@ class S3Uploader extends Component {
         this.mergeFilesList(getDataTransferItems(e));
     };
 
-    onProgress = (a) => {
-        console.log('-------', a);
-        if (this.props.onProgress) {
+    onError = (status, file) => {
+
+    };
+
+    onProgress = (percent, status, file) => {
+        this.setState({
+            files: this.state.files.map(el => el.name !== file.name ? el : Object.assign(el, {status}))
+        });
+
+        if (typeof this.props.onProgress === 'function') {
             this.props.onProgress();
         }
+    };
+
+    preprocess = (file, next) => {
+        // console.log('------- preprocess ----', file);
+        if (typeof this.props.preprocess === 'function') {
+            this.props.preprocess();
+        }
+        return next(file);
     };
 
     startUpload = () => {
@@ -73,7 +86,9 @@ class S3Uploader extends Component {
         this.myUploader = new S3Upload({
             ...this.props,
             files,
-            onProgress: this.onProgress
+            preprocess: this.preprocess,
+            onProgress: this.onProgress,
+            onError: this.onError,
         });
     };
 
@@ -87,12 +102,23 @@ class S3Uploader extends Component {
     };
 
     renderFileList = (files = [], classes) => {
+        const trClassNames = {
+            'Uploading': 'uploading-in-process',
+            'Finalizing': 'uploading-in-process',
+            'Waiting': 'uploading-in-process',
+            'Upload completed': 'uploading-done'
+        };
+
         const arr = files.map(el => {
+            console.log(el);
+            const trClassName = trClassNames[el.status];
+            // const trClassName = 'uploading-in-process';
             return (
-                <tr key={el.name}>
+                <tr key={el.name} className={trClassName || ''}>
                     <td>{el.name}</td>
                     <td>{humanFileSize(el.size)}</td>
                     <td>{el.lastModifiedDate.toLocaleDateString()}</td>
+                    <td>{el.status || 'Not uploaded'}</td>
                     <td>
                         <button type="button" title="View">
                             <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17"
@@ -124,6 +150,7 @@ class S3Uploader extends Component {
                             <th>Name</th>
                             <th>Size</th>
                             <th>Modified Date</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                         </thead>

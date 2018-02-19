@@ -111,7 +111,7 @@ export default {
                 fontSize: 13,
                 width: '1%',
                 '&:first-child': {
-                    width: '7%'
+                    width: '5%'
                 },
                 '&:last-child': {
                     textAlign: 'right'
@@ -152,7 +152,18 @@ export default {
             '&:nth-child(even) > td': {
                 background: '#fdfdfd'
             },
-
+            '&.uploading-in-process': {
+                background: '#f7fbff !important',
+                '& > *': {
+                    background: 'transparent !important'
+                },
+            },
+            '&.uploading-done': {
+                background: '#f8fff8 !important',
+                '& > *': {
+                    background: 'transparent !important'
+                },
+            },
         },
 
         '& li': {

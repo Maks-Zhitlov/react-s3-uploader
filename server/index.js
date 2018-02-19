@@ -11,7 +11,7 @@ var s3Client = new Minio.Client({
     secretKey: 'zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG'
 });
 
-const bucket = 'maks';
+const bucket = 'xxxx';
 const port = 7500;
 
 app.use(function (req, res, next) {
