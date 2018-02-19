@@ -17,7 +17,13 @@ export default {
             paddingBottom: 15,
             color: '#444',
             lineHeight: 1
-        }
+        },
+
+        '&.is-drag-over': {
+            '& >*': {
+                pointerEvents: 'none !important'
+            }
+        },
     },
     dropZoneArea: {
         display: 'flex',
@@ -27,6 +33,10 @@ export default {
         border: `2px dashed ${secondaryColor}`,
         color: '#3b7e92',
         fontSize: 16,
+        borderRadius: 5,
+        '&.is-drag-over': {
+            background: 'rgba(217, 236, 241, 0.25)',
+        },
 
         '& img': {
             maxWidth: 32,
@@ -123,6 +133,10 @@ export default {
                     border: 'none',
                     cursor: 'pointer',
                     padding: 0,
+                    '&:disabled': {
+                        pointerEvents: 'none',
+                        opacity: '.5'
+                    },
                     '&:last-child': {
                         // marginRight: 0
                     },
@@ -160,6 +174,12 @@ export default {
             },
             '&.uploading-done': {
                 background: '#f8fff8 !important',
+                '& > *': {
+                    background: 'transparent !important'
+                },
+            },
+            '&.uploading-fail': {
+                background: '#fff7f7 !important',
                 '& > *': {
                     background: 'transparent !important'
                 },
