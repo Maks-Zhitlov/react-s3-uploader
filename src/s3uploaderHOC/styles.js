@@ -141,8 +141,10 @@ export default {
                 fontSize: 13,
                 width: '.25%',
                 boxSizing: 'border-box',
+                whiteSpace: 'nowrap',
                 '&:first-child': {
-                    width: '5%'
+                    width: '5%',
+                    whiteSpace: 'normal'
                 },
                 '&:last-child': {
                     textAlign: 'right'
@@ -263,6 +265,68 @@ export default {
                     marginBottom: 0
                 }
             }
+        }
+    },
+    modalOverlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0, .55)',
+    },
+    modal: {
+        position: 'absolute',
+        width: '90%',
+        height: '55%',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        background: 'rgb(255, 255, 255)',
+        borderRadius: 5,
+        outline: 'none',
+        padding: 10,
+    },
+
+    modalItem: {
+        height: '100%',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        '& img': {
+            width: '100%',
+            maxWidth: '100%',
+            height: 'auto'
+        }
+    },
+
+    modalClose: {
+        margin: [[0, 5]],
+        outline: 'none !important',
+        border: 'none',
+        borderRadius: '50%',
+        cursor: 'pointer',
+        padding: 0,
+        position: 'absolute',
+        right: -18,
+        top: -14,
+        background: 'rgba(255,255,255, 1)',
+        width: 25,
+        height: 25,
+        transition: 'transform .1s linear',
+        '& svg': {
+            display: 'block',
+            margin: '0 auto',
+            fill: '#333',
+            transition: 'all .1s linear',
+            fillOpacity: .7,
+        },
+        '&:hover': {
+            transform: 'scale(1.15)',
+            '& svg': {
+                fillOpacity: 1,
+            },
         }
     },
 }
