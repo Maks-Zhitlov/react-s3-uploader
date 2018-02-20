@@ -10,3 +10,9 @@ body {
     max-width: 1200px;
     margin: 0 auto;
 }
+
+@media screen and (max-width: 639px){
+    .app-container {
+        padding: 0 8px;
+    }
+}

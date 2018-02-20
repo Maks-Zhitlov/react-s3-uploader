@@ -20,7 +20,6 @@ export function getDataTransferItems(event) {
     } else if (event.target && event.target.files) {
         dataTransferItemsList = event.target.files
     }
-    // console.log(dataTransferItemsList);
     return Array.from(dataTransferItemsList);
 }
 
@@ -61,12 +60,12 @@ class S3Uploader extends Component {
     handleOpenModal = this.handleOpenModal.bind(this);
     handleCloseModal = this.handleCloseModal.bind(this);
 
-    handleOpenModal () {
-        this.setState({ showModal: true });
+    handleOpenModal() {
+        this.setState({showModal: true});
     }
 
-    handleCloseModal () {
-        this.setState({ showModal: false });
+    handleCloseModal() {
+        this.setState({showModal: false});
     }
 
     handleInputChange = (e) => {
@@ -83,14 +82,17 @@ class S3Uploader extends Component {
 
     onProgress = (percent, status, file) => {
         const nextFiles = this.state.files.map(el => el.name !== file.name ? el : Object.assign(el, {status}));
-        this.setState({files: nextFiles, disableUpload: !nextFiles.every(el => el.status === 'Upload completed')});
+        const allCompleted = nextFiles.every(el => el.status === 'Upload completed' || el.status === 'Failed');
+        this.setState({
+            files: nextFiles,
+            disableUpload: !allCompleted
+        });
         if (typeof this.props.onProgress === 'function') {
             this.props.onProgress();
         }
     };
 
     preprocess = (file, next) => {
-        // console.log('------- preprocess ----', file);
         this.setState({disableUpload: true});
         if (typeof this.props.preprocess === 'function') {
             this.props.preprocess();
@@ -327,13 +329,17 @@ class S3Uploader extends Component {
                             overlayClassName={classes.modalOverlay}
                 >
                     <button className={classes.modalClose} onClick={this.handleCloseModal}>
-                        <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                             <path d="M0 0h24v24H0z" fill="none"/>
                         </svg>
                     </button>
                     <div className={classes.modalItem}>
-                        <img src="https://getbg.net/upload/full/444995_adventure-time_cn_priklyuchenie-vremya_luch_1920x1080_(www.GetBg.net).jpg" alt="/"/>
+                        <img
+                            src="https://getbg.net/upload/full/444995_adventure-time_cn_priklyuchenie-vremya_luch_1920x1080_(www.GetBg.net).jpg"
+                            alt="/"/>
                     </div>
                 </ReactModal>
             </div>

@@ -10,7 +10,9 @@ export default {
         boxShadow: '0px 0px 10px rgba(34, 34, 34, 0.15)',
         padding: [[20, 40]],
         textAlign: 'left',
-
+        '@media (max-width: 639px)': {
+            padding: [[20, 15]],
+        },
         '& header': {
             fontSize: 20,
             marginBottom: 30,
@@ -36,6 +38,13 @@ export default {
         fontSize: 16,
         borderRadius: 5,
         transition: 'all .3s ease-in-out',
+        '@media (max-width: 639px)': {
+            textAlign: 'center',
+            '& img': {
+                display: 'block',
+                margin: '0 auto 8px',
+            },
+        },
         '&.is-drag-over': {
             outlineOffset: -12,
             outlineColor: '#908f8f',
@@ -45,7 +54,11 @@ export default {
             maxWidth: 32,
             verticalAlign: 'bottom',
             marginRight: 10,
-            marginBottom: -4
+            marginBottom: -4,
+            '@media (max-width: 639px)': {
+                display: 'block',
+                margin: '0 auto 8px',
+            },
         },
 
         '& label': {
@@ -75,7 +88,6 @@ export default {
             cursor: 'pointer',
             transition: 'all .1s linear',
             margin: [[0, 5]],
-            // outline: 'none !important',
             '&:first-child': {
                 marginLeft: 0
             },
@@ -115,7 +127,9 @@ export default {
         width: '100%',
         margin: 0,
         borderCollapse: 'collapse',
-        // border: '1px solid #e0e0e0',
+        '@media (max-width: 639px)': {
+            border: '1px solid #e0e0e0',
+        },
         '& tr': {
             transition: 'background .3s ease-in-out',
             '& span': {
@@ -142,9 +156,15 @@ export default {
                 width: '.25%',
                 boxSizing: 'border-box',
                 whiteSpace: 'nowrap',
+                '@media (max-width: 639px)': {
+                    padding: [[8, 4]],
+                },
                 '&:first-child': {
                     width: '5%',
-                    whiteSpace: 'normal'
+                    whiteSpace: 'normal',
+                    '@media (max-width: 639px)': {
+                        width: '15%'
+                    }
                 },
                 '&:last-child': {
                     textAlign: 'right'
@@ -160,17 +180,11 @@ export default {
                         pointerEvents: 'none',
                         opacity: '.5'
                     },
-                    '&:last-child': {
-                        // marginRight: 0
-                    },
-                    '&:first-child': {
-                        // marginLeft: 0
-                    },
                     '& svg': {
                         verticalAlign: 'middle',
                         fill: "#333",
                         transition: 'all .1s linear',
-                        fillOpacity: .7
+                        fillOpacity: .7,
                     },
                     '&:hover': {
                         '& svg': {
@@ -183,7 +197,6 @@ export default {
             '& > th': {
                 padding: [[10, 15]],
                 fontSize: 14,
-                // background: '#f3faff'
                 background: '#fafbfb'
             },
             '&:nth-child(even) > td': {
@@ -286,6 +299,10 @@ export default {
         borderRadius: 5,
         outline: 'none',
         padding: 10,
+        '@media (max-width: 639px)': {
+            width: '82%',
+            height: '25%'
+        }
     },
 
     modalItem: {
