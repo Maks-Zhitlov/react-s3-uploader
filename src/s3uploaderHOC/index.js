@@ -54,18 +54,23 @@ class S3Uploader extends Component {
         files: [],
         disableUpload: false,
         dragOver: false,
-        showModal: false
+        showModal: false,
+        viewImageSrc: null
     };
 
-    handleOpenModal = this.handleOpenModal.bind(this);
-    handleCloseModal = this.handleCloseModal.bind(this);
 
-    handleOpenModal() {
-        this.setState({showModal: true});
+    handleOpenModal = (file) => () => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            this.setState({showModal: true, viewImageSrc: reader.result})
+        }
+        if (file) {
+            reader.readAsDataURL(file);
+        }
     }
 
-    handleCloseModal() {
-        this.setState({showModal: false});
+    handleCloseModal = () => {
+        this.setState({showModal: false})
     }
 
     handleInputChange = (e) => {
@@ -207,7 +212,7 @@ class S3Uploader extends Component {
                         {el.status || 'Not uploaded'}
                     </td>
                     <td>
-                        <button type="button" title="View" onClick={this.handleOpenModal}>
+                        <button type="button" title="View" onClick={this.handleOpenModal(el)}>
                             <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17"
                                  xmlns="http://www.w3.org/2000/svg">
                                 <path d="M0 0h24v24H0z" fill="none"/>
@@ -280,8 +285,15 @@ class S3Uploader extends Component {
         }
     };
 
+    previewFile() {
+        const preview = document.querySelector('img');
+        const file = document.querySelector('#hui').files[0];
+
+
+    }
+
     render() {
-        const {files, disableUpload, dragOver} = this.state;
+        const {files, disableUpload, dragOver, viewImageSrc} = this.state;
         const {classes, title, accept, ...rest} = this.props;
         const filesList = this.renderFileList(files, classes);
 
@@ -338,7 +350,7 @@ class S3Uploader extends Component {
                     </button>
                     <div className={classes.modalItem}>
                         <img
-                            src="https://getbg.net/upload/full/444995_adventure-time_cn_priklyuchenie-vremya_luch_1920x1080_(www.GetBg.net).jpg"
+                            src={viewImageSrc}
                             alt="/"/>
                     </div>
                 </ReactModal>

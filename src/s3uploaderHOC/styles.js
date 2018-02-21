@@ -312,9 +312,8 @@ export default {
         alignItems: 'center',
         justifyContent: 'center',
         '& img': {
-            width: '100%',
             maxWidth: '100%',
-            height: 'auto'
+            maxHeight: '100%',
         }
     },
 
