@@ -303,6 +303,9 @@ export default {
         justifyContent: 'center',
         height: '90vh',
         padding: [[0, 10]],
+        '@media (max-width: 639px)': {
+            height: 'auto',
+        },
         '& img': {
             display: 'block',
             maxWidth: '100%',
