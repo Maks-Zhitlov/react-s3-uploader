@@ -1,50 +1,11 @@
 import React, { Component } from 'react';
-import ReactS3Uploader from 'react-s3-uploader'
 import injectSheet from 'react-jss';
 import styles from './styles';
 import S3Upload from './s3upload.js';
 import PropTypes from 'prop-types';
-import ReactModal from 'react-modal';
-
-export function getDataTransferItems(event) {
-    let dataTransferItemsList = [];
-    if (event.dataTransfer) {
-        const dt = event.dataTransfer
-        if (dt.files && dt.files.length) {
-            dataTransferItemsList = dt.files
-        } else if (dt.items && dt.items.length) {
-            // During the drag even the dataTransfer.files is null
-            // but Chrome implements some drag store, which is accesible via dataTransfer.items
-            dataTransferItemsList = dt.items
-        }
-    } else if (event.target && event.target.files) {
-        dataTransferItemsList = event.target.files
-    }
-    return Array.from(dataTransferItemsList);
-}
-
-function humanFileSize(num) {
-    const UNITS = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    if (!Number.isFinite(num)) {
-        throw new TypeError(`Expected a finite number, got ${typeof num}: ${num}`);
-    }
-
-    const neg = num < 0;
-
-    if (neg) {
-        num = -num;
-    }
-
-    if (num < 1) {
-        return (neg ? '-' : '') + num + ' B';
-    }
-
-    const exponent = Math.min(Math.floor(Math.log10(num) / 3), UNITS.length - 1);
-    const numStr = Number((num / Math.pow(1000, exponent)).toPrecision(3));
-    const unit = UNITS[exponent];
-
-    return (neg ? '-' : '') + numStr + ' ' + unit;
-}
+import { getDataTransferItems } from './helpers'
+import FileList from './filelist';
+import ModalWindow from './modalwindow'
 
 class S3Uploader extends Component {
     myUploader;
@@ -67,11 +28,11 @@ class S3Uploader extends Component {
         if (file) {
             reader.readAsDataURL(file);
         }
-    }
+    };
 
     handleCloseModal = () => {
         this.setState({showModal: false})
-    }
+    };
 
     handleInputChange = (e) => {
         this.mergeFilesList(getDataTransferItems(e));
@@ -125,134 +86,6 @@ class S3Uploader extends Component {
         this.setState({files: []})
     };
 
-    filesStatus(status) {
-        switch (status) {
-            case 'Waiting': {
-                return (
-                    <span className={'waitingIcon'}>
-                        <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17"
-                             xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
-                        <path d="M0 0h24v24H0z" fill="none"/>
-                        <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-                    </svg>
-                    </span>
-                );
-            }
-            case 'Finalizing': {
-                return (
-                    <span className={'finalizingIcon'}>
-                        <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17"
-                             xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
-                        <path d="M0 0h24v24H0z" fill="none"/>
-                        <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-                    </svg>
-                    </span>
-                )
-            }
-            case 'Uploading':
-                return (
-                    <span className={'loadIcon'}>
-                            <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17"
-                                 xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
-                            <path d="M0 0h24v24H0z" fill="none"/>
-                            </svg>
-                        </span>
-                );
-            case 'Upload completed':
-                return (
-                    <span className={'succesIcon'}>
-                            <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17"
-                                 xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 0h24v24H0z" fill="none"/>
-                            <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
-                            </svg>
-                        </span>
-                );
-                break;
-            case 'Failed':
-                return (
-                    <span className={'failedIcon'}>
-                            <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17"
-                                 xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 0h24v24H0z" fill="none"/>
-                            <path
-                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-                            </svg>
-                        </span>
-                );
-                break;
-        }
-    }
-
-    renderFileList = (files = [], classes) => {
-        const trClassNames = {
-            'Uploading': 'uploading-in-process',
-            'Finalizing': 'uploading-finalize',
-            // 'Waiting': 'uploading-in-process',
-            'Upload completed': 'uploading-done',
-            'Failed': 'uploading-fail',
-        };
-
-        const arr = files.map(el => {
-            const trClassName = trClassNames[el.status];
-            const {disableUpload} = this.state;
-            return (
-                <tr key={el.name} className={trClassName || ''}>
-                    <td>{el.name}</td>
-                    <td>{humanFileSize(el.size)}</td>
-                    <td>{el.lastModifiedDate.toLocaleDateString()}</td>
-                    <td className={'statusColumn'}>
-                        {this.filesStatus(el.status)}
-                        {el.status || 'Not uploaded'}
-                    </td>
-                    <td>
-                        <button type="button" title="View" onClick={this.handleOpenModal(el)}>
-                            <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M0 0h24v24H0z" fill="none"/>
-                                <path
-                                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                            </svg>
-                        </button>
-                        <button disabled={disableUpload} type="button" title="Remove" onClick={this.removeItem(el)}>
-                            <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                                <path d="M0 0h24v24H0z" fill="none"/>
-                            </svg>
-                        </button>
-                    </td>
-                </tr>
-            )
-        });
-
-        return (
-            arr.length ?
-                <div className={classes.filesListWrapper}>
-                    <table className={classes.filesList}>
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Size</th>
-                            <th>Modified Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>{arr}</tbody>
-                    </table>
-                </div>
-                : []
-        )
-    };
-
     onDropFiles = (e) => {
         e.preventDefault();
         const {disableUpload} = this.state;
@@ -271,7 +104,7 @@ class S3Uploader extends Component {
         this.setState({files: [].concat(currentFiles, nextFiles)});
     };
 
-    onDragEnter = (e) => {
+    onDragEnter = () => {
         const {disableUpload} = this.state;
         if (!disableUpload) {
             this.setState({dragOver: true});
@@ -285,17 +118,9 @@ class S3Uploader extends Component {
         }
     };
 
-    previewFile() {
-        const preview = document.querySelector('img');
-        const file = document.querySelector('#hui').files[0];
-
-
-    }
-
     render() {
         const {files, disableUpload, dragOver, viewImageSrc} = this.state;
         const {classes, title, accept, ...rest} = this.props;
-        const filesList = this.renderFileList(files, classes);
 
         return (
             <div
@@ -324,7 +149,12 @@ class S3Uploader extends Component {
 
                 </div>
 
-                {filesList}
+                <FileList
+                    onDeleteClick={this.removeItem}
+                    onViewItem={this.handleOpenModal}
+                    disableUpload={disableUpload}
+                    files={files}>
+                </FileList>
 
                 <div className={classes.actionBar}>
                     {files.length ?
@@ -335,25 +165,12 @@ class S3Uploader extends Component {
                         Files
                     </button>
                 </div>
-                <ReactModal isOpen={this.state.showModal}
-                            onRequestClose={this.handleCloseModal}
-                            className={classes.modal}
-                            overlayClassName={classes.modalOverlay}
-                >
-                    <div className={classes.modalItem}>
-                        <img
-                            src={viewImageSrc}
-                            alt="/"/>
-                        <button className={classes.modalClose} onClick={this.handleCloseModal}>
-                            <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                                <path d="M0 0h24v24H0z" fill="none"/>
-                            </svg>
-                        </button>
-                    </div>
-                </ReactModal>
+                <ModalWindow
+                    openModal={this.handleOpenModal}
+                    closeModal={this.handleCloseModal}
+                    isOpen={this.state.showModal}
+                    imageSrc={this.state.viewImageSrc}
+                ></ModalWindow>
             </div>
         )
     }
