@@ -1,13 +1,13 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import injectSheet from 'react-jss';
 import styles from './styles';
-import S3Upload from './s3upload.js';
+import S3Upload from 'react-s3-uploader/s3upload';
 import PropTypes from 'prop-types';
-import { getDataTransferItems } from './helpers'
-import FileList from './filelist';
-import ModalWindow from './modalwindow'
+import {getDataTransferItems} from './helpers'
+import FileList from './components/FileList';
+import ModalWindow from './components/PreviewImage'
 
-class S3Uploader extends Component {
+class S3ImageUploader extends Component {
     myUploader;
     draggableEl;
 
@@ -24,7 +24,7 @@ class S3Uploader extends Component {
         const reader = new FileReader();
         reader.onloadend = () => {
             this.setState({showModal: true, viewImageSrc: reader.result})
-        }
+        };
         if (file) {
             reader.readAsDataURL(file);
         }
@@ -38,7 +38,31 @@ class S3Uploader extends Component {
         this.mergeFilesList(getDataTransferItems(e));
     };
 
-    onError = (status, file) => {
+    handleDrop = (e) => {
+        e.preventDefault();
+        const {disableUpload} = this.state;
+        if (!disableUpload) {
+            this.setState({dragOver: false});
+            const allowedFiles = this.props.accept === '*' ? getDataTransferItems(e) : getDataTransferItems(e).filter(el => this.props.accept.includes(el.type.split('/')[0]));
+            this.mergeFilesList(allowedFiles);
+        }
+    };
+
+    handleDragEnter = () => {
+        const {disableUpload} = this.state;
+        if (!disableUpload) {
+            this.setState({dragOver: true});
+        }
+    };
+
+    handleDragLeave = (e) => {
+        e.preventDefault();
+        if (e.target === this.draggableEl && this.state.dragOver) {
+            this.setState({dragOver: false});
+        }
+    };
+
+    onUploadError = (status, file) => {
         const nextFiles = this.state.files.map(el => el.name !== file.name ? el : Object.assign(el, {status: 'Failed'}));
         this.setState({files: nextFiles, disableUpload: false});
         if (typeof this.props.onError === 'function') {
@@ -46,7 +70,7 @@ class S3Uploader extends Component {
         }
     };
 
-    onProgress = (percent, status, file) => {
+    onUploadProgress = (percent, status, file) => {
         const nextFiles = this.state.files.map(el => el.name !== file.name ? el : Object.assign(el, {status}));
         const allCompleted = nextFiles.every(el => el.status === 'Upload completed' || el.status === 'Failed');
         this.setState({
@@ -58,7 +82,7 @@ class S3Uploader extends Component {
         }
     };
 
-    preprocess = (file, next) => {
+    uploadPreprocess = (file, next) => {
         this.setState({disableUpload: true});
         if (typeof this.props.preprocess === 'function') {
             this.props.preprocess();
@@ -71,29 +95,19 @@ class S3Uploader extends Component {
         this.myUploader = new S3Upload({
             ...this.props,
             files: files.filter(el => el.status !== 'Upload completed'),
-            preprocess: this.preprocess,
-            onProgress: this.onProgress,
-            onError: this.onError,
+            preprocess: this.uploadPreprocess,
+            onProgress: this.onUploadProgress,
+            onError: this.onUploadError,
         });
     };
 
-    removeItem = (item = {}) => (e) => {
+    removeFile = (item = {}) => (e) => {
         e.preventDefault();
         this.setState({files: this.state.files.filter(el => el.name !== item.name)});
     };
 
     cleanFiles = () => {
         this.setState({files: []})
-    };
-
-    onDropFiles = (e) => {
-        e.preventDefault();
-        const {disableUpload} = this.state;
-        if (!disableUpload) {
-            this.setState({dragOver: false});
-            const allowedFiles = this.props.accept === '*' ? getDataTransferItems(e) : getDataTransferItems(e).filter(el => this.props.accept.includes(el.type.split('/')[0]));
-            this.mergeFilesList(allowedFiles);
-        }
     };
 
     mergeFilesList = (nextFiles = []) => {
@@ -104,23 +118,9 @@ class S3Uploader extends Component {
         this.setState({files: [].concat(currentFiles, nextFiles)});
     };
 
-    onDragEnter = () => {
-        const {disableUpload} = this.state;
-        if (!disableUpload) {
-            this.setState({dragOver: true});
-        }
-    };
-
-    onDragLeave = (e) => {
-        e.preventDefault();
-        if (e.target === this.draggableEl && this.state.dragOver) {
-            this.setState({dragOver: false});
-        }
-    };
-
     render() {
-        const {files, disableUpload, dragOver, viewImageSrc} = this.state;
-        const {classes, title, accept, ...rest} = this.props;
+        const {files, disableUpload, dragOver, viewImageSrc, showModal} = this.state;
+        const {classes, title, accept} = this.props;
 
         return (
             <div
@@ -128,14 +128,16 @@ class S3Uploader extends Component {
                 onDragStart={(e) => {
                     e.preventDefault();
                 }}
-                onDragEnter={this.onDragEnter}
+                onDragEnter={this.handleDragEnter}
                 onDragOver={(e) => {
                     e.preventDefault();
                 }}
-                onDragLeave={this.onDragLeave}
-                onDrop={this.onDropFiles}
+                onDragLeave={this.handleDragLeave}
+                onDrop={this.handleDrop}
                 className={`${classes.box} ${dragOver ? 'is-drag-over' : ''}`}>
+
                 <header>{title}</header>
+
                 <div className={`${classes.dropZoneArea} ${dragOver ? 'is-drag-over' : ''}`}>
                     <div>
                         <img
@@ -150,7 +152,7 @@ class S3Uploader extends Component {
                 </div>
 
                 <FileList
-                    onDeleteClick={this.removeItem}
+                    onDeleteClick={this.removeFile}
                     onViewItem={this.handleOpenModal}
                     disableUpload={disableUpload}
                     files={files}>
@@ -165,18 +167,20 @@ class S3Uploader extends Component {
                         Files
                     </button>
                 </div>
+
+
                 <ModalWindow
                     openModal={this.handleOpenModal}
                     closeModal={this.handleCloseModal}
-                    isOpen={this.state.showModal}
-                    imageSrc={this.state.viewImageSrc}
+                    isOpen={showModal}
+                    imageSrc={viewImageSrc}
                 ></ModalWindow>
             </div>
         )
     }
 }
 
-S3Uploader.defaultProps = {
+S3ImageUploader.defaultProps = {
     title: 'Upload Files',
     contentDisposition: 'auto',
     accept: '*',
@@ -186,7 +190,7 @@ S3Uploader.defaultProps = {
     autoUpload: true
 };
 
-S3Uploader.propTypes = {
+S3ImageUploader.propTypes = {
     accept: PropTypes.string.isRequired,
     title: PropTypes.string,
     signingUrl: PropTypes.string,
@@ -214,6 +218,4 @@ S3Uploader.propTypes = {
     autoUpload: PropTypes.bool
 };
 
-export default injectSheet(styles)(S3Uploader)
-
-
+export default injectSheet(styles)(S3ImageUploader);

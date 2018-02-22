@@ -1,0 +1,9 @@
+body {
+    background: #f9f9f9;
+    font-family: sans-serif;
+}
+
+body .example-app {
+    max-width: 1200px;
+    margin: 0 auto;
+}

@@ -35,3 +35,11 @@ export function getDataTransferItems(event) {
     }
     return Array.from(dataTransferItemsList);
 }
+
+export const statuses = {
+    waiting: 'Waiting',
+    uploading: 'Uploading',
+    finalizing: 'Finalizing',
+    complete: 'Upload completed',
+    fail: 'Failed',
+};

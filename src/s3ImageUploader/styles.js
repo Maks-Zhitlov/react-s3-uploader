@@ -1,9 +1,9 @@
-const primaryColor = '#238bf9';
-const bgColor = '#f5f9fa';
-const secondaryColor = '#d8ebf1';
-
-
 export default {
+    '@global': {
+        'body.ReactModal__Body--open': {
+            overflow: 'hidden'
+        }
+    },
     box: {
         background: '#fff',
         margin: '20px 0',
@@ -33,7 +33,7 @@ export default {
         alignItems: 'center',
         justifyContent: 'center',
         height: 120,
-        outline: `2px dashed ${secondaryColor}`,
+        outline: `2px dashed #d8ebf1`,
         color: '#3b7e92',
         fontSize: 16,
         borderRadius: 5,
@@ -217,12 +217,12 @@ export default {
                     color: '#f0ad4e'
                 },
                 '& span': {
-                  '& svg': {
-                      fill: "#f0ad4e",
-                  }
+                    '& svg': {
+                        fill: "#f0ad4e",
+                    }
                 },
                 '& .loadIcon': {
-                    animation: 'App-logo-spin infinite 2s linear',
+                    animation: 'ExampleApp-logo-spin infinite 2s linear',
                 },
             },
             '&.uploading-done': {
@@ -310,29 +310,27 @@ export default {
             display: 'block',
             maxWidth: '100%',
             maxHeight: '100%',
-            border: '10px solid #fff',
-            borderRadius: 10,
+            border: '3px solid #fff',
         }
     },
 
     modalClose: {
-        margin: [[0, 5]],
+        margin: [0],
         outline: 'none !important',
         border: 'none',
-        borderRadius: '50%',
         cursor: 'pointer',
         padding: 0,
         position: 'absolute',
         right: 8,
         top: 8,
-        background: 'rgba(255,255,255, 1)',
-        width: 25,
-        height: 25,
+        background: 'transparent',
+        width: 30,
+        height: 30,
         transition: 'transform .1s linear',
         '& svg': {
             display: 'block',
             margin: '0 auto',
-            fill: '#333',
+            fill: '#fff',
             transition: 'all .1s linear',
             fillOpacity: .7,
         },

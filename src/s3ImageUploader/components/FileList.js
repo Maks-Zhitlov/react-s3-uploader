@@ -1,18 +1,21 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import injectSheet from 'react-jss';
-import styles from './styles';
-import { humanFileSize } from './helpers'
-import { StatusIcon } from './statusIcon'
+import styles from '../styles';
+import {humanFileSize} from '../helpers'
+import {StatusIcon} from './StatusIcon'
 import PropTypes from 'prop-types';
+import {statuses} from '../helpers';
+
+const iconSize = 17;
+const iconColor = '#000';
 
 class FileList extends Component {
-
     render() {
         const trClassNames = {
-            'Uploading': 'uploading-in-process',
-            'Finalizing': 'uploading-finalize',
-            'Upload completed': 'uploading-done',
-            'Failed': 'uploading-fail'
+            [statuses.uploading]: 'uploading-in-process',
+            [statuses.finalizing]: 'uploading-finalize',
+            [statuses.complete]: 'uploading-done',
+            [statuses.fail]: 'uploading-fail'
         };
 
         const {classes, disableUpload, onDeleteClick, onViewItem, files} = this.props;
@@ -30,7 +33,7 @@ class FileList extends Component {
                     </td>
                     <td>
                         <button type="button" title="View" onClick={onViewItem(el)}>
-                            <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17"
+                            <svg fill={iconColor} height={iconSize} viewBox="0 0 24 24" width={iconSize}
                                  xmlns="http://www.w3.org/2000/svg">
                                 <path d="M0 0h24v24H0z" fill="none"/>
                                 <path
@@ -38,7 +41,7 @@ class FileList extends Component {
                             </svg>
                         </button>
                         <button disabled={disableUpload} type="button" title="Remove" onClick={onDeleteClick(el)}>
-                            <svg fill="#000000" height="17" viewBox="0 0 24 24" width="17"
+                            <svg fill={iconColor} height={iconSize} viewBox="0 0 24 24" width={iconSize}
                                  xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
@@ -48,7 +51,7 @@ class FileList extends Component {
                     </td>
                 </tr>
             )
-        })
+        });
 
         return (
             arr.length ?
